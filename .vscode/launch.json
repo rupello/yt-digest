@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug yt-digest.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/yt-digest.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {},
+            "args": ["3zxMmPkkn6M"]
+        }
+    ]
+}
