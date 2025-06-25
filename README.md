@@ -2,17 +2,32 @@
 
 A command-line tool that uses AI to generate markdown summaries of YouTube videos from their transcripts.
 
-## Features
+## Usage
 
-- Extract transcripts from YouTube videos using video URLs or IDs
-- Generate AI-powered summaries with structured markdown output
-- Support for multiple LLM models (Anthropic Claude, etc.)
-- Automatic timestamp linking for key highlights
-- Clean, readable markdown output format
+```
+ Usage: yt-digest.py [OPTIONS] VIDEO
+
+ Summarize a YouTube video transcript using AI.
+
+ Provide either a YouTube URL or video ID to generate a markdown summary.
+
+╭─ Arguments ────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ *    video      TEXT  YouTube video URL or video ID [default: None] [required]                                         │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ──────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --output              -o      TEXT  Output markdown file path [default: None]                                          │
+│ --model               -m      TEXT  LLM model to use for summarization [default: None]                                 │
+│ --install-completion                Install completion for the current shell.                                          │
+│ --show-completion                   Show completion for the current shell, to copy it or customize the installation.   │
+│ --help                              Show this message and exit.                                                        │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+```
+
 
 ## Installation
 
-Install the project dependencies:
+Requires `uv` then:
 
 ```bash
 uv sync
@@ -36,42 +51,6 @@ uv run yt-digest.py summarize VIDEO_ID
 
 - `--output, -o`: Specify output file path (default: `youtube_summary_{video_id}.md`)
 - `--model, -m`: Choose specific LLM model for summarization
-
-### Examples
-
-```bash
-# Basic usage
-uv run yt-digest.py summarize "https://youtu.be/dQw4w9WgXcQ"
-
-# Custom output file
-uv run yt-digest.py summarize VIDEO_ID --output my_summary.md
-
-# Using specific model
-uv run yt-digest.py summarize VIDEO_ID --model claude-3-sonnet
-```
-
-## Output Format
-
-The generated markdown file includes:
-
-1. **One-line description** of the video
-2. **Summary paragraph** of the main content
-3. **Conclusions** (if applicable)
-4. **Key highlights** (up to 5) with timestamp links back to the video
-
-## Dependencies
-
-- **llm**: Core LLM interface library
-- **llm-anthropic**: Anthropic Claude model support
-- **llm-claude**: Additional Claude model integration
-- **youtube-transcript-api**: YouTube transcript extraction
-- **typer**: Command-line interface framework
-
-## Requirements
-
-- Python 3.12+
-- Valid YouTube videos with available transcripts
-- Configured LLM API access (for AI summarization)
 
 ## License
 
