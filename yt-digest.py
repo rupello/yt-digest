@@ -7,12 +7,14 @@
 #    "llm-anthropic>=0.17",
 #    "llm-claude>=0.4.2",
 #    "youtube-transcript-api>=1.1.0",
-#    "typer>=0.9.0"
+#    "typer>=0.9.0",
+#    "requests>=2.25.0"
 # ]
 # ///
 import re
 import llm
 import typer
+import requests
 from typing import Optional
 from youtube_transcript_api import YouTubeTranscriptApi
 
@@ -43,6 +45,28 @@ def get_transcript(video_id):
     except Exception as e:
         raise Exception(f"Failed to fetch transcript for video {video_id}: {e}")
 
+def get_video_title(video_id):
+    """Fetch video title from YouTube"""
+    try:
+        # Use YouTube's oEmbed API to get video metadata
+        url = f"https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v={video_id}&format=json"
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        return data.get('title', f'Video_{video_id}')
+    except Exception as e:
+        typer.echo(f"Warning: Could not fetch video title: {e}", err=True)
+        return f"Video_{video_id}"
+
+def sanitize_filename(title):
+    """Sanitize title for use as filename"""
+    # Remove or replace characters that are problematic in filenames
+    sanitized = re.sub(r'[<>:"/\\|?*]', '_', title)
+    # Limit length to avoid filesystem issues
+    if len(sanitized) > 100:
+        sanitized = sanitized[:100]
+    return sanitized
+
 
 
 def summarize_transcript(video_id_or_url: str, output_file: Optional[str] = None):
@@ -50,6 +74,11 @@ def summarize_transcript(video_id_or_url: str, output_file: Optional[str] = None
     
     # Extract video ID
     video_id = extract_video_id(video_id_or_url)
+    
+    # Get video title
+    typer.echo("Fetching video metadata...")
+    video_title = get_video_title(video_id)
+    typer.echo(f"Video title: {video_title}")
     
     # Get transcript
     transcript = get_transcript(video_id)
@@ -59,7 +88,7 @@ def summarize_transcript(video_id_or_url: str, output_file: Optional[str] = None
     
     # Extract highlights for timestamp matching
     prompt = f"""
-    This is a transcript of a YouTube video with id {video_id}.
+    This is a transcript of a YouTube video titled "{video_title}" with id {video_id}.
     From this transcript, generate a markdown document containing the following:
     1. A one line description of the video
     2. A single paragraph summary of the main content
@@ -74,7 +103,8 @@ def summarize_transcript(video_id_or_url: str, output_file: Optional[str] = None
     
     # Save to file
     if output_file is None:
-        output_file = f"youtube_summary_{video_id}.md"
+        sanitized_title = sanitize_filename(video_title)
+        output_file = f"{sanitized_title}_{video_id}.md"
     
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(markdown_content.text())
