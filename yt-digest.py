@@ -88,12 +88,19 @@ def summarize_transcript(video_id_or_url: str, output_file: Optional[str] = None
     
     # Extract highlights for timestamp matching
     prompt = f"""
+    You write summaries of youtube videos using a youtube transcript. 
+
     This is a transcript of a YouTube video titled "{video_title}" with id {video_id}.
+
     From this transcript, generate a markdown document containing the following:
     1. A one line description of the video
     2. A single paragraph summary of the main content
     3. A summary of conclusions (if any)
     4. Up to 5 key highlights or important points from the video, with links to the video at that time
+
+    Use a wry, entertaining style. Note if the title of the video is not congruent with the content.
+    If the title is a question, comment if the conclusion answers the question.
+    If the title is a bold or controversial statement or question, comment if the video could be considered 'clickbait'
 
     Transcript: {transcript}
     """
